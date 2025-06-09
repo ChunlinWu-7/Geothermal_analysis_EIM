@@ -26,7 +26,23 @@
 *.a
 *.lib
 
+#C++ visual studio files
+*.pdb
+*.vcxproj
+*.user
+*.filters
+*.recipe
+*.ilk
+*.log
+*.idb
+*.tlog
+*.lastbuildstate
+*.iobj
+*.ipdb
+
+
 # Executables
 *.exe
 *.out
 *.app
+/.vs
