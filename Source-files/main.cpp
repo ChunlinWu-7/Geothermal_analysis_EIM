@@ -24,11 +24,5 @@ int main()
 		READ.Heat_source, READ.index_Q, READ.index_Q_i, READ.index_Q_ij, READ.index_T_i, READ.index_T_ij, READ.index_T_ijk, \
 		READ.temp, READ.flux);
 
-	//READ.temperature_work();
-
-	//EIM.post_eigen_nodes(READ.nsolve, READ.NN, READ.NODES, READ.num, READ.eigen_point, READ.radius, READ.U, \
-		READ.Heat_source, READ.index_Q, READ.index_Q_i, READ.index_Q_ij, READ.index_T_i, READ.index_T_ij, READ.index_T_ijk, \
-		READ.temp_nodes);
-
 	return 0;
 }
