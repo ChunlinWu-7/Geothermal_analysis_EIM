@@ -1,7 +1,7 @@
 # Geothermal engineering -- spherical water tanks under time-harmonic heat transfer
 
 ## Description
-This software package serves as supplemental information for Reviewers to review/verify results/figures/findings in the manuscript "The Green's Function Based Analysis for Seasonal Heat Storage and Utilization in a Solar-Geothermal Building". 
+This software package serves as supplemental information for Reviewers and Editorial board members to review/verify results/figures/findings in the manuscript "The Green's Function Based Analysis for Seasonal Heat Storage and Utilization in a Solar-Geothermal Building". 
 
 This software package is not open-access currently, which will be available after acceptance of the above manuscript. 
 
