@@ -9,7 +9,7 @@ using namespace std;
 
 void Reading_inputs::Start_read()
 {
-   // generate_particles();
+    generate_particles();
 
 	Start_input_particle();
 	
@@ -214,12 +214,16 @@ void Reading_inputs::Start_input_heatsource()
         Heat_source(i) = 0.0;
     }
 
-    //cout << "input Qv" << endl;\
+    //cout << "input Q_division" << endl;\
     double div;\
     cin >> div;
 
+   // cout << "input ratio" << endl; \
+        double ratio; \
+        cin >> ratio;
+
     for (int i = 0; i < num; i++) {
-       // Heat_source(index_Q[i]) = eigen_mat(i, 2) * pow(0.5, 3.0) / pow(radius(0), 3.0) * 12.5 / 12.5 * (10.0 / double(num));
+        //Heat_source(index_Q[i]) = eigen_mat(i, 2) * pow(0.5, 3.0) / pow(radius(0), 3.0) * 12.5 / 12.5 * (10.0 / double(num));
         Heat_source(index_Q[i]) = eigen_mat(i, 2);
     }
 }
@@ -239,7 +243,8 @@ void Reading_inputs::Start_input_post()
 
             if (line_num == 0) {
                 nump = stoi(line);
-                nump = 801;
+                //nump = 201 * 201;
+                nump = 5001;
 
                 // initialization of temperature and flux in postprocess
                 temp = new complex<double> [nump]; flux = new complex<double>* [nump];
@@ -273,35 +278,45 @@ void Reading_inputs::Start_input_post()
     myfile.close();
 
    // along the axis symmetric:
-    for (int i = 0; i < nump; i++) {\
+    for (int i = 0; i < nump; i++) {
+        Points(i, 0) = -25.0 * radius(0) + 50.0 * radius(0) / (5000.0) * i;\
+        Points(i, 1) = 0.0;\
+        Points(i, 2) = eigen_point(0, 2);
+
         //Points(i, 2) = eigen_point(0, 2); Points(i, 1) = eigen_point(0, 1); \
         //Points(i, 2) = -25.0 / (nump - 1) * i;
         //Points(i, 0) = eigen_point(0,0) - 15.0 * radius(0) + 30.0 * radius(0) / 5000.0 * i; 
         //Points(i, 0) = 0.0 - 25.0 * radius(0) + 50.0 * radius(0) / 5000.0 * i; \
 
-        Points(i, 0) = eigen_point(0, 0); Points(i, 1) = eigen_point(0, 1);
+        //Points(i, 0) = eigen_point(0, 0); Points(i, 1) = eigen_point(0, 1);
 
-        Points(i, 2) = 0.0 - 0.1 * 0.25 * i;
+        //Points(i, 2) = 0.0 - 0.01875 * i;
     }
+
+    //nump = 3;\
+    Points(0, 0) = 0.0; Points(0, 1) = 0.0; Points(0, 2) = eigen_point(0, 2);\
+    Points(1, 0) = 0.0; Points(1, 1) = 0.0; Points(1, 2) = eigen_point(0, 2) + radius(0); \
+    Points(2, 0) = 0.0; Points(2, 1) = 0.0; Points(2, 2) = eigen_point(0, 2) - radius(0); \
+        
+
     //cout << Points << endl;
    // center of the tank:
     //nump = 1; \
-        Points(0, 0) = 0.0; eigen_point(0, 0); \
+        Points(0, 0) = 0.0; Points(0,1) = 0.0; \
     Points(0, 2) = eigen_point(0, 2);
-
     // contour plot:
+    
     /*
-    nump = 201 * 201;
     Points.resize(nump, 3);
     temp = new complex<double>[nump];
     for (int i = 0; i < nump; i++) {
         temp[i] = 0.0;
     }
 
-    for (int i = 0; i < 201; i++) {
+    for (int i = 0; i < 400 + 1; i++) {
         for (int j = 0; j < 201; j++) {
-            Points(i * 201 + j, 0) = 0.0;
-            Points(i * 201 + j, 1) = eigen_point(0, 1) + 2.0 * radius(0) - 4.0 * radius(0) / (200.0) * i;
+            Points(i * 201 + j, 0) = eigen_point(0, 0) - 2.0 * radius(0) + (eigen_point(1, 0) - eigen_point(0, 0) + 4.0 * radius(0)) / (400.0) * i ;
+            Points(i * 201 + j, 1) = eigen_point(0, 1);//eigen_point(0, 1) + 2.0 * radius(0) - 4.0 * radius(0) / (200.0) * i;
             Points(i * 201 + j, 2) = eigen_point(0, 2) + 2.0 * radius(0) - 4.0 * radius(0) / (200.0) * j;
         }
     }
@@ -379,55 +394,11 @@ void Reading_inputs::Start_input_post()
     ofstream myfile_s; myfile_s.open("post_info_origin.txt");
 
     for (int i = 0; i < nump; i++) {
-        myfile_s << (Points(i, 0)) / radius(0) << endl;
+        myfile_s << (Points(i, 0) - eigen_point(0, 0)) / radius(0) << " " \
+            << (Points(i,2) - eigen_point(0, 2)) / radius(0) << endl;
     }
 
     myfile_s.close();
-}
-
-void Reading_inputs::Start_input_post_BC()
-{
-    ifstream myfile; string line; stringstream ss;
-
-    int line_num = 0;
-
-    myfile.open("post_nodes.txt", ios::in);
-
-    while (!myfile.eof()) {
-        getline(myfile, line);
-
-        if (line[0] != '#' && line.length() != 0 && line[0] != '\t') {
-
-            if (line_num == 0) {
-                NN = stoi(line);
-
-                // initialization of temperature and flux in postprocess
-                temp_nodes = new complex<double>[NN]; 
-
-                for (int i = 0; i < NN; i++) {
-                    temp_nodes[i] = 0.0 + 0.0i;
-                }
-
-                NODES.resize(NN, 3);
-
-                line_num++;
-            }
-            else if (line_num < NN + 1) {
-                ss << line; ss >> NODES(line_num - 1, 0) >> NODES(line_num - 1, 1) >> NODES(line_num - 1, 2);
-                ss.clear();
-
-                line_num++;
-            }
-        }
-        else if (line[0] == '#') {
-            // print the comments
-            cout << line << endl;
-        }
-
-    }
-
-    myfile.close();
-
 }
 
 void Reading_inputs::generate_particles()
@@ -436,7 +407,11 @@ void Reading_inputs::generate_particles()
 
     double volume_total = 4.0 * pi / 3.0 * pow(1.75, 3.0) * 2.0;
 
-    num = 7; double a = pow(volume_total / double(num) / (4.0 * pi) * 3.0, 1.0 / 3.0);
+    num = 9; double a = pow(volume_total / double(num) / (4.0 * pi) * 3.0, 1.0 / 3.0);
+
+    double total_energy = 4.0 / 3.0 * pi * 2.0 * pow(1.75, 3.0) * 58.0;
+
+    double indi_energy = total_energy / (double(num)) / (4.0 * pi / 3.0 * a * a * a);
 
     double CD; 
 
@@ -447,17 +422,9 @@ void Reading_inputs::generate_particles()
     myfile << num << endl;
 
     for (int i = 0; i < num; i++) {
-
-        // annual
         myfile << -double(num - 1) * 0.5 * double(CD) * a + i * double(CD) * a << " " << \
             0 << " " << -15.0 << " " << a << " " \
-            << 15.8308 << " " << 3.03533 << " " << 33.5923 << endl;
-
-
-        // daily
-        //myfile << -double(num - 1) * 0.5 * 2.0 * a + i * 2.0 * a << " " << \
-            0 << " " << -10.0 * a << " " << a << " " \
-            << 0.00592531 * 1000.0 << " " << 5.39823 * 1000.0 << " " << 7.79681 * 1000.0 << endl;
+            << 239.6 << " " << 4.1495E6 << " " << indi_energy << endl;
     }
 
     myfile << "QUA" << endl;

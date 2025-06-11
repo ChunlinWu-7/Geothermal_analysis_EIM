@@ -45,7 +45,6 @@ private:
 	void Start_input_particle();
 	void particle_index();
 	void Start_input_post();
-	void Start_input_post_BC();
 	void Start_input_heatsource();
 
 	// generate particles

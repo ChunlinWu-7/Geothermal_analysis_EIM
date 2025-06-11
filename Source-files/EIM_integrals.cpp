@@ -560,33 +560,38 @@ void EIM_integrals::post_eigen(int nsolve, int num_post, Ref<MatrixXd> Points, i
 	post_eigen_flux(nsolve, num_post, Points, num, eigen_point, radius, U, Heat_source, index_B, index_B_i, index_B_ij\
 		, index_E_i, index_E_ij, index_E_ijk, flux);
 
-	ofstream myfile_T, myfile_F;
+	ofstream myfile_T, myfile_F, myfile_T_ori;
 
 	myfile_T.open("post_temp.txt"); 
 	myfile_F.open("post_flux.txt"); 
+	myfile_T_ori.open("post_temp_ori.txt");
+
+	double sd = 6.0;
 
 	for (int i = 0; i < num_post; i++) {
 
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < sd; j++) {
 
-			myfile_T << (temp[i] * exp(-1.0i * (double(j) - 3.0) * 2.0 * pi / 6.0)).real() + 0.0\
+			myfile_T << (temp[i] * exp(-1.0i * (double(j) - sd / 2.0) * 2.0 * pi / sd)).real() + 0.0\
 				+ (13.89 * exp((1.0 - 1.0i) * f_m * Points(i, 2)) \
-					* exp(-1.0i * (double(j) - 3.0) * 2.0 * pi / 6.0)).real() + 12.78 << '\t';
+					* exp(-1.0i * (double(j) - sd / 2.0) * 2.0 * pi / sd)).real() + 12.78 << '\t';
 
+			myfile_T_ori << (13.89 * exp((1.0 - 1.0i) * f_m * Points(i, 2)) \
+					* exp(-1.0i * (double(j) - sd / 2.0) * 2.0 * pi / sd)).real() + 12.78 << '\t';
 
 			for (int s = 2; s < 3; s++) {
-				myfile_F << (flux[i][s] * exp(-1.0i * (double(j) - 3.0) * 2.0 * pi / 6.0)).real() +
+				myfile_F << (flux[i][s] * exp(-1.0i * (double(j) - sd / 2.0) * 2.0 * pi / sd)).real() +
 					(-K_0 * 13.89 * d[s][2] * exp((1.0 - 1.0i) * Points(i, 2) * f_m) * (1.0 - 1.0i) \
-						* f_m * exp(-1.0i * (double(j) - 3.0) * 2.0 * pi / 6.0)).real()\
+						* f_m * exp(-1.0i * (double(j) - sd / 2.0) * 2.0 * pi / sd)).real()\
 					<< '\t';
 			}
 
 		}
 
-		myfile_T << endl; myfile_F << endl;
+		myfile_T << endl; myfile_F << endl; myfile_T_ori << endl;
 	}
 
-	myfile_T.close(); myfile_F.close();
+	myfile_T.close(); myfile_F.close(); myfile_T_ori.close();
 }
 
 
@@ -722,14 +727,13 @@ void EIM_integrals::post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Poin
 					dist += pow(Points(s, i) - eigen_point(h, i), 2.0);
 				}
 				dist = sqrt(dist);
-				if (dist < 1.0 * radius(h)) {
+				if (dist <= 1.0 * radius(h)) {
 					test[s] = h;
 				}
 			}
 
 		}
 
-		int s, h;
 		double* x = new double[3]; double* x_p = new double[3];
 
 		// For flux equivalence:time integral
@@ -741,7 +745,7 @@ void EIM_integrals::post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Poin
 
 #pragma omp for schedule(dynamic)
 
-		for (s = 0; s < num_post; s++) {
+		for (int s = 0; s < num_post; s++) {
 
 			complex<double>* ETG = new complex<double>[3];
 			for (int i = 0; i < 3; i++) {
