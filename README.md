@@ -10,12 +10,19 @@ Eigen-3.4.0 and boost library are applied to conduct analysis.
 
 Please install these two libraries before compiling the code. 
 
-## In/Output files:
-(1) particle.txt: specify number of water tanks; positions of tanks; effective thermal conductivity; effective heat capacity; 
+## Intput files:
+(1) soil_properties: specify the thermal conductivity and heat capcity of the soil;
 
-(2) post_temp.txt: postprocess temperature; 
+(2) particle.txt: specify number of water tanks; positions of tanks; effective thermal conductivity; effective heat capacity; 
 
-(3) post_flux.txt: postprocess heat flux; 
+(3) post_info.txt: specify post-process points.
+
+## Output files:
+(1) post_temp.txt: postprocess temperature; 
+
+(2) post_flux.txt: postprocess heat flux; 
+
+(3) post_temp_ori.txt: annual temperature profile.
 
 ## Contributor
 
