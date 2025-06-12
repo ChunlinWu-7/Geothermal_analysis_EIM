@@ -15,11 +15,14 @@ extern const double full_flag;
 extern const int annual_flag;
 
 // excitation frequency
-extern const double omega, f_m;
-extern const complex<double> FF;
+extern const double omega; extern double f_m;
+extern complex<double> FF;
 
 // heat conductivity and capacity, heat transfer coefficient
-extern const double K_0, Cp_0, alpha_0;
+extern double K_0, Cp_0, alpha_0;
+
+// output months or days:
+extern const double sdd;
 
 // Kornecter delta function
 extern const double d[3][3];

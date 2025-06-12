@@ -9,6 +9,11 @@ using namespace Eigen;
 
 class EIM_integrals {
 public:
+	/*
+		addInclusion: arrange coefficient matrices for equivalent conditions:
+
+		(1) add_equiv_0: uniform order; (2) add_equiv_1: linear order; (3) add_equiv_2: quadratic order
+	*/
 
 	void addInclusion(int nsolve, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<MatrixXd> eigen_mat, Ref<MatrixXcd> HMAT, Ref<MatrixXcd> GMAT\
 		,Ref<VectorXcd> RHS, int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk);
@@ -22,21 +27,15 @@ public:
 	void add_equiv_2(int nsolve, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<MatrixXd> eigen_mat, Ref<MatrixXcd> HMAT, Ref<MatrixXcd> GMAT\
 		, int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk);
 
-	// Postprocess, displacement and stress
+	// Postprocess, temperature and heat flux:
 	void post_eigen(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, Ref<VectorXd> Heat_source,\
 		int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>* temp, complex<double>** flux);
-
-	void post_eigen_nodes(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, Ref<VectorXd> Heat_source, \
-		int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>* temp);
 
 	void post_eigen_temp(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, Ref<VectorXd> Heat_source, \
 		int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>* temp);
 
 	void post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, Ref<VectorXd> Heat_source, \
 		int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>** flux);
-
-	// Print Eshelby's tensor: second order product!
-	void Print_Eshelby_tensor(int num_post, Ref<MatrixXd> Points, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius);
 
 private:
 

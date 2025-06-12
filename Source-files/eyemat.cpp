@@ -19,33 +19,20 @@ const double full_flag = -1.0;
 */
 const int annual_flag = 1;
 
-// thermal constants for verification purposes:\
-const double K_0 = 1.0; \
-const double Cp_0 = 1.0; \
-const double alpha_0 = K_0 / Cp_0; \
-
 // thermal constants for annual temperature purposes:
-const double K_0 = 3.62;\
-const double Cp_0 = 2.787E6;\
-const double alpha_0 = K_0 / Cp_0;\
-
-// thermal constants for daily temperature purposes:\
-const double K_0 = 0.0168895 * 1000.0;\
-const double Cp_0 = 3.61299 * 1000.0;\
-const double alpha_0 = K_0 / Cp_0;\
-
-// excitation frequency
-// daily or annual change:
-//const double omega = 1.0 / 24.0 * (2.0 * pi);
+double K_0 = 3.62;\
+double Cp_0 = 2.787E6;\
+double alpha_0 = K_0 / Cp_0;\
 
 // annual change:
 const double omega = 1.0 / (364.0 * 24 * 3600.0) * 2.0 * pi;
 
-// excitation frequency for verification:\
-const double omega = 5.0 *(2.0 * pi);
-const double f_m = sqrt(omega / (2.0 * alpha_0));
+const double sdd = 6.0;
 
-const complex<double> FF = f_m * (1.0 + 1.0i);
+// excitation frequency: 
+double f_m = sqrt(omega / (2.0 * alpha_0));
+
+complex<double> FF = f_m * (1.0 + 1.0i);
 
 // Kornecter delta function
 const double d[3][3] = { 1,0,0,0,1,0,0,0,1 };

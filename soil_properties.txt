@@ -1,0 +1,2 @@
+# Soil properties: K and C_p
+3.62 2.787E6

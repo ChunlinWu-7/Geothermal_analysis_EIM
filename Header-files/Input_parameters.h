@@ -36,9 +36,6 @@ public:
 
 	int* index_Q, * index_Q_i, ** index_Q_ij;
 	void Start_read();
-	
-	// postprocess of temperature
-	void temperature_work();
 
 private:
 	// particle information
@@ -47,7 +44,7 @@ private:
 	void Start_input_post();
 	void Start_input_heatsource();
 
-	// generate particles
-	void generate_particles();
+	// input material properties of the soil:
+	void read_soil();
 
 };

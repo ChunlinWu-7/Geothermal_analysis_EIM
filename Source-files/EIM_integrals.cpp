@@ -554,19 +554,31 @@ void EIM_integrals::add_equiv_2(int nsolve, int num, Ref<MatrixXd> eigen_point, 
 void EIM_integrals::post_eigen(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, \
 	Ref<VectorXd> Heat_source, int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>* temp, complex<double>** flux)
 {
+	/*
+		Postprocess of temperature and heat flux
+	*/
+
 	post_eigen_temp(nsolve, num_post, Points, num, eigen_point, radius, U, Heat_source, index_B, index_B_i, index_B_ij\
 		, index_E_i, index_E_ij, index_E_ijk, temp);
 
 	post_eigen_flux(nsolve, num_post, Points, num, eigen_point, radius, U, Heat_source, index_B, index_B_i, index_B_ij\
 		, index_E_i, index_E_ij, index_E_ijk, flux);
 
+	/*
+		post_temp.txt: postprocess temperature, including disturbances of tanks;
+		post_flux.txt: postprocess heat flux;
+		post_temp_ori.txt: temperature profile (the unperturbed solution)
+	*/
+
 	ofstream myfile_T, myfile_F, myfile_T_ori;
 
-	myfile_T.open("post_temp.txt"); 
-	myfile_F.open("post_flux.txt"); 
-	myfile_T_ori.open("post_temp_ori.txt");
+	myfile_T.open("post_temp.txt"); myfile_F.open("post_flux.txt"); myfile_T_ori.open("post_temp_ori.txt");
 
-	double sd = 6.0;
+	/*
+		sd refers to division: (1) see several months, sd = 6.0; (2) see daily variation: sd = 364.0;
+	*/
+
+	double sd = sdd;
 
 	for (int i = 0; i < num_post; i++) {
 
@@ -592,22 +604,6 @@ void EIM_integrals::post_eigen(int nsolve, int num_post, Ref<MatrixXd> Points, i
 	}
 
 	myfile_T.close(); myfile_F.close(); myfile_T_ori.close();
-}
-
-
-void EIM_integrals::post_eigen_nodes(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, Ref<VectorXd> Heat_source, \
-	int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>* temp)
-{
-	post_eigen_temp(nsolve, num_post, Points, num, eigen_point, radius, U, Heat_source, index_B, index_B_i, index_B_ij\
-		, index_E_i, index_E_ij, index_E_ijk, temp);
-
-	ofstream myfile_T; myfile_T.open("BC.txt");
-
-	for (int i = 0; i < num_post; i++) {
-		myfile_T << temp[i].real() << '\t' << temp[i].imag() << endl;
-	}
-
-	myfile_T.close(); 
 }
 
 void EIM_integrals::post_eigen_temp(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, \
@@ -682,26 +678,11 @@ void EIM_integrals::post_eigen_temp(int nsolve, int num_post, Ref<MatrixXd> Poin
 		destroy_0(M_i, Mp_i, Mpq_i, J_ij, Jp_ij, Jpq_ij, Mp, Mpq, J_i, Jp_i, Jpq_i);
 		delete[] x; delete[] x_p; 
 	}
-
-	// add temperature profile:
-
-	if (annual_flag == 1) {
-		for (int s = 0; s < num_post; s++) {
-			//temp[s] = temp[s] + 13.89 * exp((1.0 + 1.0i) * f_m * Points(s, 2));
-			//temp[s] = 13.89 * exp((1.0 + 1.0i) * f_m * Points(s, 2));
-		}
-	}
-	else {
-		for (int s = 0; s < num_post; s++) {
-			//temp[s] = temp[s] + 7.78 * exp((1.0 + 1.0i) * f_m * Points(s, 2));
-		}
-	}
 }
 
 void EIM_integrals::post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Points, int num, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius, Ref<VectorXcd> U, \
 	Ref<VectorXd> Heat_source, int* index_B, int* index_B_i, int** index_B_ij, int* index_E_i, int** index_E_ij, int*** index_E_ijk, complex<double>** flux)
 {
-	// retrieve
 	complex<double> * Eigen = new complex<double>[num * nsolve];
 
 	for (int i = 0; i < num * nsolve; i++) {
@@ -717,7 +698,7 @@ void EIM_integrals::post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Poin
 		int* test = new int[num_post];
 		for (int i = 0; i < num_post; i++) {
 			test[i] = -1;
-			ep_s[i] = new double[3];			// 3 ETG flux	
+			ep_s[i] = new double[3];			
 		}
 
 		for (int s = 0; s < num_post; s++) {
@@ -828,69 +809,6 @@ void EIM_integrals::post_eigen_flux(int nsolve, int num_post, Ref<MatrixXd> Poin
 		delete[] x; delete[] x_p; delete[] test;
 	}
 
-}
-
-// Print Eshelby's tensor
-void EIM_integrals::Print_Eshelby_tensor(int num_post, Ref<MatrixXd> Points, Ref<MatrixXd> eigen_point, Ref<VectorXd> radius)
-{
-
-	complex<double>*** D_ij = new complex<double> **[num_post];
-	for (int i = 0; i < num_post; i++) {
-		D_ij[i] = new complex<double>*[3];
-		for (int j = 0; j < 3; j++) {
-			D_ij[i][j] = new complex<double>[3];
-		}
-	}
-
-#pragma omp parallel shared(Points, eigen_point, radius)
-
-	{
-		int s;
-		double* x = new double[3]; double* x_p = new double[3];
-
-		// For flux equivalence:time integral
-		complex<double>* M_i, ** Mp_i, *** Mpq_i, ** J_ij, *** Jp_ij, **** Jpq_ij;
-		// For temperature equivalence: without time integral: Non-use in postprocess for gradient!
-		complex<double> M_tensor, * Mp, ** Mpq, * J_i, ** Jp_i, *** Jpq_i;
-
-		inil_0(M_i, Mp_i, Mpq_i, J_ij, Jp_ij, Jpq_ij, Mp, Mpq, J_i, Jp_i, Jpq_i);
-
-#pragma omp for schedule(dynamic)
-
-		for (s = 0; s < num_post; s++) {
-
-			x[0] = Points(s, 0); x[1] = Points(s, 1); x[2] = Points(s, 2);
-
-			x_p[0] = eigen_point(0, 0); x_p[1] = eigen_point(0, 1); x_p[2] = eigen_point(0, 2);
-			DIE SPE;
-			SPE.D10_heat(52, x, x_p, radius[0], M_i, Mp_i, Mpq_i, J_ij, Jp_ij, Jpq_ij);
-
-			// by ETG
-			for (int i = 0; i < 3; i++) {
-				for (int j = 0; j < 3; j++) {
-					D_ij[s][i][j] = J_ij[i][j];
-				}
-			}
-
-		}
-
-		destroy_0(M_i, Mp_i, Mpq_i, J_ij, Jp_ij, Jpq_ij, Mp, Mpq, J_i, Jp_i, Jpq_i);
-		delete[] x; delete[] x_p;
-	}
-
-	// for D_{ij}
-	ofstream myfile; myfile.open("Eshelby_tensor.txt");
-
-	for (int i = 0; i < num_post; i++) {
-		for (int j = 0; j < 3; j++) {
-			for (int k = 0; k < 3; k++) {
-				//myfile << D_ij[i][j][k].real() << " " << D_ij[i][j][k].imag() << " ";
-				myfile << sqrt(D_ij[i][j][k].real() * D_ij[i][j][k].real() + D_ij[i][j][k].imag() * D_ij[i][j][k].imag()) << " ";
-			}
-		}
-		myfile << endl;
-	}
-	myfile.close();
 }
 
 // add temperature gradient and temperature difference
