@@ -33,4 +33,4 @@ Huiming Yin, Associate Professor, Columbia University.
 © 2025 Chunlin Wu. All rights reserved.  
 
 ## To cite this work:
-Chunlin Wu, Tengxiang Wang, Huiming Yin, The Green's Function Based Analysis for Seasonal Heat Storage and Utilization in a Solar-Geothermal Building (Submitted for publication), Journal of Energy Storage. 
+Chunlin Wu, Tengxiang Wang, Huiming Yin, The Green's Function Based Analysis for Seasonal Heat Storage and Utilization in a Solar-Geothermal Building, Journal of Energy Storage. 
